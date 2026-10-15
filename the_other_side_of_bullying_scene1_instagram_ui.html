@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Scene 1 — Viral Post</title>
+<style>
+:root{--ink:#171717;--muted:#737373;--line:#e8e8e8;--paper:#fff;--blue:#3897f0;--pink:#ff3158;--soft:#f6f6f6}
+*{box-sizing:border-box}
+body{margin:0;background:#f2f2f2;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid #7ebcff;outline-offset:2px}
+.app{width:100%;max-width:560px;min-height:100dvh;margin:0 auto;background:var(--paper);position:relative;box-shadow:0 0 40px #0000000a}
+.topbar{height:55px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:5}
+.brand{font-family:Georgia,serif;font-size:25px;font-weight:700;letter-spacing:-1.2px}
+.top-icon{border:0;background:transparent;padding:7px;display:grid;place-items:center;color:#161616}
+.feed-screen{display:block}
+.post-head{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.avatar{height:36px;width:36px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#18251f;background:linear-gradient(135deg,#f6d7a7,#e5a4a8,#a8d8c9);border:1px solid #eee}
+.userline{min-width:0;flex:1}
+.username{font-size:14px;font-weight:700}
+.location{font-size:12px;color:var(--muted);margin-top:2px}
+.more{border:0;background:transparent;font-weight:900;font-size:21px;padding:4px 6px}
+.video-wrap{position:relative;background:#08090b;line-height:0;overflow:hidden;touch-action:pan-y}
+video{display:block;width:100%;max-height:72dvh;aspect-ratio:4/5;object-fit:contain;background:#08090b}
+.tap-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#0009;color:white;border-radius:30px;padding:8px 12px;font-size:12px;line-height:1.2;white-space:nowrap;pointer-events:none;transition:opacity .3s}
+.big-heart{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.25);font-size:104px;color:#fff;text-shadow:0 4px 25px #0008;opacity:0;pointer-events:none}
+.big-heart.pop{animation:heartpop .75s ease-out}
+@keyframes heartpop{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}65%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.85)}}
+.post-actions{display:flex;align-items:center;gap:15px;padding:9px 13px 0}
+.action{display:flex;align-items:center;gap:5px;border:0;background:transparent;padding:3px 0;color:var(--ink);font-size:14px}
+.action svg{width:27px;height:27px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.action.liked{color:var(--pink)}
+.action.liked svg{fill:var(--pink);stroke:var(--pink)}
+.bookmark{margin-left:auto}
+.post-copy{padding:8px 14px 15px;font-size:14px;line-height:1.45}
+.post-copy strong{font-weight:700}
+.caption{margin-top:5px}
+.tags{color:#426b9b}
+.view-comments{border:0;background:transparent;color:var(--muted);padding:0 14px 9px;font-size:13px;text-align:left}
+.view-count{padding:0 14px 13px;color:var(--muted);font-size:11px}
+.screen-comments{display:none;min-height:calc(100dvh - 55px);flex-direction:column}
+.comments-top{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line)}
+.back{border:0;background:transparent;font-size:24px;line-height:1;padding:2px 5px}
+.comments-title{font-weight:750;font-size:15px}
+.comments-subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+.comments-scroll{padding:4px 14px 14px;overflow-y:auto;flex:1;max-height:calc(100dvh - 245px)}
+.comment{display:grid;grid-template-columns:36px minmax(0,1fr) 28px;gap:10px;padding:13px 0;border-bottom:1px solid #f0f0f0;align-items:start}
+.comment .avatar{height:34px;width:34px;font-size:11px}
+.comment-main{font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.comment-main strong{font-weight:750;margin-right:4px}
+.comment-time{font-size:11px;color:var(--muted);margin-top:6px;display:flex;gap:12px;align-items:center}
+.comment-time button{border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:650;padding:0}
+.comment-like{border:0;background:transparent;color:#999;font-size:19px;padding:2px 0}
+.comment-like.liked{color:var(--pink)}
+.comment-like.liked span{font-weight:900}
+.comment-composer{border-top:1px solid var(--line);padding:12px 14px calc(12px + env(safe-area-inset-bottom));background:#fff}
+.composer-label{font-size:12px;font-weight:750;margin-bottom:8px}
+.suggestions{display:flex;gap:7px;overflow-x:auto;padding:0 0 10px;scrollbar-width:thin}
+.suggestion{border:1px solid #dedede;background:white;border-radius:18px;padding:7px 10px;white-space:nowrap;font-size:12px;color:#333}
+.suggestion.selected{border-color:#a8c9f4;background:#eef6ff;color:#185da4}
+.compose-row{display:flex;align-items:center;gap:9px}
+.compose-row .avatar{height:32px;width:32px}
+#commentInput{min-width:0;flex:1;border:0;background:transparent;outline:none;font-size:14px;padding:8px 0}
+#commentInput::placeholder{color:#a0a0a0}
+#postComment{border:0;background:transparent;color:var(--blue);font-weight:750;font-size:13px;padding:8px 0}
+#postComment:disabled{opacity:.35;cursor:not-allowed}
+.note{font-size:10px;color:#888;padding-top:6px}
+.toast{font-size:12px;color:#327b54;min-height:16px;padding-top:5px}
+.reset-wrap{padding:15px 14px 25px;border-top:1px solid var(--line);background:#fafafa}
+.reset{width:100%;padding:11px 14px;border:1px solid #dedede;border-radius:9px;background:#fff;font-weight:650;font-size:13px}
+@media(min-width:700px){body{padding:22px 0}.app{min-height:calc(100dvh - 44px);border-radius:12px;overflow:hidden}.video-wrap video{max-height:68dvh}.comments-scroll{max-height:calc(100dvh - 310px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="app" id="app">
+  <div class="topbar">
+    <button class="top-icon" id="homeBtn" aria-label="Back to video" title="Back to video">
+      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 9.5V21h13V9.5M9.5 21v-7h5v7"/></svg>
+    </button>
+    <div class="brand">insta<span style="font-style:italic">view</span></div>
+    <button class="top-icon" id="topCommentBtn" aria-label="Open comments">
+      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg>
+    </button>
+  </div>
+
+  <section class="feed-screen" id="feedScreen" aria-label="Viral post">
+    <div class="post-head">
+      <div class="avatar">SW</div>
+      <div class="userline"><div class="username">schoolwatch.sg <span aria-label="fictional account">✓</span></div><div class="location">Singapore</div></div>
+      <button class="more" aria-label="More post options">···</button>
+    </div>
+    <div class="video-wrap" id="videoWrap" aria-label="Video post. Double tap to like; tap outside the video controls to view comments.">
+      <video id="viralVideo" controls playsinline preload="metadata" aria-label="Video clip supplied for the exhibition">
+        <source src="IMG_7266.mp4" type="video/mp4">
+        Your browser does not support video playback. Keep IMG_7266.mp4 in the same folder as this page.
+      </video>
+      <div class="big-heart" id="bigHeart" aria-hidden="true">♥</div>
+      <div class="tap-hint" id="tapHint">Double-tap to like · Tap outside controls for comments</div>
+    </div>
+    <div class="post-actions">
+      <button class="action" id="likePost" aria-label="Like post" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></svg>
+      </button>
+      <button class="action" id="openComments" aria-label="View comments">
+        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg>
+      </button>
+      <button class="action" id="sharePost" aria-label="Share post">
+        <svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      </button>
+      <button class="action bookmark" id="savePost" aria-label="Save post" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+      </button>
+    </div>
+    <div class="post-copy"><strong id="likeCount">18,204 likes</strong><div class="caption"><strong>schoolwatch.sg</strong> This clip from a school corridor is spreading everywhere. What do you think should happen next? 👀 <span class="tags">#SingaporeSchools #ViralClip</span></div></div>
+    <button class="view-comments" id="viewCommentsText">View all <span id="commentCount">8</span> comments</button>
+    <div class="view-count">VIEWED BY 284,612 PEOPLE · 18 MINUTES AGO</div>
+  </section>
+
+  <section class="screen-comments" id="commentsScreen" aria-label="Comments">
+    <div class="comments-top">
+      <button class="back" id="backToVideo" aria-label="Back to video">‹</button>
+      <div><div class="comments-title">Comments</div><div class="comments-subtitle">A viral clip. Many perspectives.</div></div>
+    </div>
+    <div class="comments-scroll" id="commentsList">
+      <article class="comment"><div class="avatar">JL</div><div class="comment-main"><strong>jasonlim</strong> Expel him. If you do this in public, imagine what happens when nobody is watching.<div class="comment-time"><span>12m</span><button type="button">Reply</button><span>2,104 likes</span></div></div><button class="comment-like" aria-label="Like comment" aria-pressed="false">♡</button></article>
+      <article class="comment"><div class="avatar">M2</div><div class="comment-main"><strong>mummyof2</strong> The victim shouldn't have to go to school feeling scared. Please protect the child.<div class="comment-time"><span>11m</span><button type="button">Reply</button><span>1,680 likes</span></div></div><button class="comment-like" aria-label="Like comment" aria-pressed="false">♡</button></article>
+      <article class="comment"><div class="avatar">KT</div><div class="comment-main"><strong>kopiandtea</strong> Kids these days need discipline. No consequences means they will keep doing it.<div class="comment-time"><span>10m</span><button type="button">Reply</button><span>967 likes</span></div></div><button class="comment-like" aria-label="Like comment" aria-pressed="false">♡</button></article>
+      <article class="comment"><div class="avatar">AM</div><div class="comment-main"><strong>amandaaa</strong> I was bullied in sec school too. Everyone saw it but nobody wanted to get involved.<div class="comment-time"><span>9m</span><button type="button">Reply</button><span>1,342 likes</span></div></div><button class="comment-like" aria-label="Like comment" aria-pressed="false">♡</button></article>
+      <article class="comment"><div class="avatar">DM</div><div class="comment-main"><strong>dadmode</strong> One 17-second clip cannot tell us everything. Still, the school needs to check what happened.<div class="comment-time"><span>8m</span><button type="button">Reply</button><span>723 likes</span></div></div><button class="comment-like" aria-label="Like comment" aria-pressed="false">♡</button></article>
+      <article class="comment"><div class="avatar">RT</div><div class="comment-main"><strong>rachel.t</strong> Why are people reposting this? The students' faces and school could be identified.<div class="comment-time"><span>7m</span><button type="button">Reply</button><span>588 likes</span></div></div><button class="comment-like" aria-label="Like comment" aria-pressed="false">♡</button></article>
+      <article class="comment"><div class="avatar">FI</div><div class="comment-main"><strong>firdauz</strong> Maybe something happened before the recording? Asking that isn't the same as excusing it.<div class="comment-time"><span>5m</span><button type="button">Reply</button><span>491 likes</span></div></div><button class="comment-like" aria-label="Like comment" aria-pressed="false">♡</button></article>
+      <article class="comment"><div class="avatar">LL</div><div class="comment-main"><strong>lowkey_l</strong> Honestly I would just scroll. Every time I comment, people start fighting in the replies.<div class="comment-time"><span>2m</span><button type="button">Reply</button><span>205 likes</span></div></div><button class="comment-like" aria-label="Like comment" aria-pressed="false">♡</button></article>
+    </div>
+    <div class="comment-composer">
+      <div class="composer-label">What would you say?</div>
+      <div class="suggestions" aria-label="Suggested comment starters">
+        <button class="suggestion" data-text="The student should be held accountable.">Accountability</button>
+        <button class="suggestion" data-text="I hope the student who was hurt gets support.">Support the victim</button>
+        <button class="suggestion" data-text="We don't know the full story from this clip alone.">Need more context</button>
+        <button class="suggestion" data-text="Sharing this could expose the students further.">Think before sharing</button>
+        <button class="suggestion" data-text="I experienced something similar when I was younger.">My experience</button>
+      </div>
+      <div class="compose-row">
+        <div class="avatar">YOU</div>
+        <input id="commentInput" type="text" maxlength="220" placeholder="Add a comment…" aria-label="Write a comment">
+        <button id="postComment" disabled>Post</button>
+      </div>
+      <div class="note">Your comment is only added to this local simulation. It is not published online.</div>
+      <div class="toast" id="commentToast" role="status" aria-live="polite"></div>
+    </div>
+    <div class="reset-wrap"><button class="reset" id="restart">↻ Reset for the next visitor</button></div>
+  </section>
+</main>
+<script>
+(() => {
+  const feed = document.getElementById('feedScreen');
+  const commentsScreen = document.getElementById('commentsScreen');
+  const video = document.getElementById('viralVideo');
+  const wrap = document.getElementById('videoWrap');
+  const hint = document.getElementById('tapHint');
+  const heart = document.getElementById('bigHeart');
+  const likeBtn = document.getElementById('likePost');
+  const likeCount = document.getElementById('likeCount');
+  const input = document.getElementById('commentInput');
+  const postBtn = document.getElementById('postComment');
+  const list = document.getElementById('commentsList');
+  const commentCount = document.getElementById('commentCount');
+  const toast = document.getElementById('commentToast');
+  let liked = false, saved = false, localLikes = 18204, lastTap = 0, commentTotal = 8;
+
+  function openComments() {
+    feed.style.display = 'none';
+    commentsScreen.style.display = 'flex';
+    commentsScreen.style.flexDirection = 'column';
+    toast.textContent = '';
+    setTimeout(() => input.focus({preventScroll:true}), 100);
+  }
+  function openVideo() {
+    commentsScreen.style.display = 'none';
+    feed.style.display = 'block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function setLiked(value, animate=false) {
+    if (liked === value) {
+      if (animate && value) showHeart();
+      return;
+    }
+    liked = value;
+    likeBtn.classList.toggle('liked', liked);
+    likeBtn.setAttribute('aria-pressed', String(liked));
+    likeBtn.setAttribute('aria-label', liked ? 'Unlike post' : 'Like post');
+    likeBtn.innerHTML = liked
+      ? '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></svg>'
+      : '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></svg>';
+    localLikes = 18204 + (liked ? 1 : 0);
+    likeCount.textContent = localLikes.toLocaleString() + ' likes';
+    if (animate && liked) showHeart();
+  }
+  function showHeart() {
+    heart.classList.remove('pop');
+    void heart.offsetWidth;
+    heart.classList.add('pop');
+  }
+  likeBtn.addEventListener('click', () => setLiked(!liked));
+  let singleTapTimer = null;
+  wrap.addEventListener('click', (event) => {
+    // A single tap opens comments after a short delay; a double-tap likes the post.
+    // Taps near the bottom controls are left to the native video player.
+    const now = Date.now();
+    const rect = video.getBoundingClientRect();
+    const y = event.clientY - rect.top;
+    const nearControls = y > rect.height - 58;
+    if (nearControls) return;
+    if (now - lastTap < 330) {
+      if (singleTapTimer) clearTimeout(singleTapTimer);
+      singleTapTimer = null;
+      lastTap = 0;
+      setLiked(true, true);
+    } else {
+      lastTap = now;
+      singleTapTimer = setTimeout(() => {
+        if (lastTap === now) openComments();
+        singleTapTimer = null;
+      }, 330);
+    }
+  });
+  // On touch devices, the native video element handles playback; the visible hint and buttons open comments.
+  document.getElementById('openComments').addEventListener('click', openComments);
+  document.getElementById('viewCommentsText').addEventListener('click', openComments);
+  document.getElementById('topCommentBtn').addEventListener('click', openComments);
+  document.getElementById('backToVideo').addEventListener('click', openVideo);
+  document.getElementById('homeBtn').addEventListener('click', openVideo);
+
+  document.getElementById('sharePost').addEventListener('click', () => {
+    const btn = document.getElementById('sharePost');
+    btn.style.color = '#3897f0';
+    btn.setAttribute('aria-label','Share simulation selected');
+    hint.textContent = 'Share selected — simulation only';
+    setTimeout(() => { btn.style.color=''; hint.textContent='Double-tap to like · Tap outside controls for comments'; }, 1800);
+  });
+  document.getElementById('savePost').addEventListener('click', () => {
+    saved = !saved;
+    const btn = document.getElementById('savePost');
+    btn.classList.toggle('liked', saved);
+    btn.setAttribute('aria-pressed',String(saved));
+    btn.setAttribute('aria-label',saved?'Unsave post':'Save post');
+  });
+
+  document.querySelectorAll('.comment-like').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const active = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed',String(!active));
+      btn.classList.toggle('liked',!active);
+      btn.textContent = active ? '♡' : '♥';
+    });
+  });
+  document.querySelectorAll('.suggestion').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.suggestion').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      input.value = btn.dataset.text;
+      input.focus();
+      postBtn.disabled = !input.value.trim();
+    });
+  });
+  input.addEventListener('input', () => { postBtn.disabled = !input.value.trim(); });
+  postBtn.addEventListener('click', () => {
+    const text = input.value.trim();
+    if (!text) return;
+    const article = document.createElement('article');
+    article.className = 'comment';
+    const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = 'YOU';
+    const main = document.createElement('div'); main.className = 'comment-main';
+    const strong = document.createElement('strong'); strong.textContent = 'you';
+    main.appendChild(strong); main.appendChild(document.createTextNode(' ' + text));
+    const meta = document.createElement('div'); meta.className = 'comment-time';
+    const time = document.createElement('span'); time.textContent = 'now';
+    const local = document.createElement('span'); local.textContent = '0 likes';
+    meta.append(time, local); main.appendChild(meta);
+    const like = document.createElement('button'); like.className = 'comment-like'; like.setAttribute('aria-label','Like your comment'); like.setAttribute('aria-pressed','false'); like.textContent='♡';
+    like.addEventListener('click',()=>{const active=like.getAttribute('aria-pressed')==='true';like.setAttribute('aria-pressed',String(!active));like.classList.toggle('liked',!active);like.textContent=active?'♡':'♥';local.textContent=active?'0 likes':'1 like';});
+    article.append(avatar,main,like);
+    list.appendChild(article);
+    commentTotal++;
+    commentCount.textContent = commentTotal;
+    input.value = ''; postBtn.disabled = true;
+    document.querySelectorAll('.suggestion').forEach(b=>b.classList.remove('selected'));
+    toast.textContent = 'Comment added to this session only.';
+    list.scrollTop = list.scrollHeight;
+  });
+
+  document.getElementById('restart').addEventListener('click', () => {
+    setLiked(false);
+    saved = false;
+    const saveBtn = document.getElementById('savePost'); saveBtn.classList.remove('liked'); saveBtn.setAttribute('aria-pressed','false'); saveBtn.setAttribute('aria-label','Save post');
+    list.innerHTML = '';
+    const defaults = [
+      ['JL','jasonlim','Expel him. If you do this in public, imagine what happens when nobody is watching.','12m','2,104 likes'],
+      ['M2','mummyof2',"The victim shouldn't have to go to school feeling scared. Please protect the child.",'11m','1,680 likes'],
+      ['KT','kopiandtea','Kids these days need discipline. No consequences means they will keep doing it.','10m','967 likes'],
+      ['AM','amandaaa','I was bullied in sec school too. Everyone saw it but nobody wanted to get involved.','9m','1,342 likes'],
+      ['DM','dadmode','One 17-second clip cannot tell us everything. Still, the school needs to check what happened.','8m','723 likes'],
+      ['RT','rachel.t',"Why are people reposting this? The students' faces and school could be identified.",'7m','588 likes'],
+      ['FI','firdauz',"Maybe something happened before the recording? Asking that isn't the same as excusing it.",'5m','491 likes'],
+      ['LL','lowkey_l','Honestly I would just scroll. Every time I comment, people start fighting in the replies.','2m','205 likes']
+    ];
+    defaults.forEach(([initial,name,text,time,likes])=>{
+      const a=document.createElement('article');a.className='comment';
+      const av=document.createElement('div');av.className='avatar';av.textContent=initial;
+      const m=document.createElement('div');m.className='comment-main';
+      const s=document.createElement('strong');s.textContent=name;m.appendChild(s);m.appendChild(document.createTextNode(' '+text));
+      const meta=document.createElement('div');meta.className='comment-time';
+      const t=document.createElement('span');t.textContent=time;
+      const r=document.createElement('button');r.type='button';r.textContent='Reply';
+      const l=document.createElement('span');l.textContent=likes;meta.append(t,r,l);m.appendChild(meta);
+      const like=document.createElement('button');like.className='comment-like';like.setAttribute('aria-label','Like comment');like.setAttribute('aria-pressed','false');like.textContent='♡';
+      like.addEventListener('click',()=>{const active=like.getAttribute('aria-pressed')==='true';like.setAttribute('aria-pressed',String(!active));like.classList.toggle('liked',!active);like.textContent=active?'♡':'♥';});
+      a.append(av,m,like);list.appendChild(a);
+    });
+    commentTotal = 8; commentCount.textContent = '8';
+    input.value='';postBtn.disabled=true;toast.textContent='';
+    document.querySelectorAll('.suggestion').forEach(b=>b.classList.remove('selected'));
+    openVideo(); video.pause(); video.currentTime=0;
+    hint.textContent='Double-tap to like · Tap outside controls for comments';
+  });
+})();
+</script>
+</body>
+</html>
